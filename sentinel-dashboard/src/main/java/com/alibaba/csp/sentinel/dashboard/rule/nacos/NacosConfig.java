@@ -15,6 +15,11 @@
  */
 package com.alibaba.csp.sentinel.dashboard.rule.nacos;
 
+import java.util.List;
+import java.util.Properties;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 import com.alibaba.csp.sentinel.dashboard.datasource.entity.gateway.ApiDefinitionEntity;
 import com.alibaba.csp.sentinel.dashboard.datasource.entity.gateway.GatewayFlowRuleEntity;
 import com.alibaba.csp.sentinel.dashboard.datasource.entity.rule.AuthorityRuleEntity;
@@ -22,17 +27,12 @@ import com.alibaba.csp.sentinel.dashboard.datasource.entity.rule.DegradeRuleEnti
 import com.alibaba.csp.sentinel.dashboard.datasource.entity.rule.FlowRuleEntity;
 import com.alibaba.csp.sentinel.dashboard.datasource.entity.rule.ParamFlowRuleEntity;
 import com.alibaba.csp.sentinel.dashboard.datasource.entity.rule.SystemRuleEntity;
+import com.alibaba.csp.sentinel.dashboard.domain.cluster.ClusterGroupEntity;
 import com.alibaba.csp.sentinel.datasource.Converter;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.nacos.api.PropertyKeyConst;
 import com.alibaba.nacos.api.config.ConfigFactory;
 import com.alibaba.nacos.api.config.ConfigService;
-import org.springframework.boot.context.properties.EnableConfigurationProperties;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-
-import java.util.List;
-import java.util.Properties;
 
 /**
  * @author Eric Zhao
@@ -118,7 +118,16 @@ public class NacosConfig {
         return s-> JSON.parseArray(s, ApiDefinitionEntity.class);
     }
 
+  // ====================集群分配规则 Converter
+  @Bean
+  public Converter<List<ClusterGroupEntity>, String> clusterGroupEntityEncoder() {
+    return JSON::toJSONString;
+  }
 
+  @Bean
+  public Converter<String, List<ClusterGroupEntity>> clusterGroupEntityDecoder() {
+    return s -> JSON.parseArray(s, ClusterGroupEntity.class);
+  }
 
     @Bean
     public ConfigService nacosConfigService(NacosPropertiesConfig nacosPropertiesConfig) throws Exception {
